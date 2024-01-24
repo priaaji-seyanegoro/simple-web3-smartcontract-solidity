@@ -1,108 +1,83 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
-import styles from "../styles/Home.module.css";
-import Image from "next/image";
+import { ConnectWallet, Web3Button, useAddress, useContract, useContractRead } from "@thirdweb-dev/react";
 import { NextPage } from "next";
+import { useState } from "react";
 
 const Home: NextPage = () => {
+  const address = useAddress()
+  const { contract } = useContract("your contract address here")
+  const {
+    data: numberValues,
+    isLoading
+  } = useContractRead(contract, "retrieve")
+  const [newValue, setNewValue] = useState(0);
   return (
-    <main className={styles.main}>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>
-            Welcome to{" "}
-            <span className={styles.gradientText0}>
-              <a
-                href="https://thirdweb.com/"
-                target="_blank"
-                rel="noopener noreferrer"
+    <div style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100vh",
+    }}>
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1px solid black",
+        padding: "1rem",
+        borderRadius: "1rem",
+        backgroundColor: "#232323",
+        minWidth: "400px"
+      }}>
+        <ConnectWallet style={{
+          width: "100%"
+        }} />
+
+        <div>
+          <h1>{isLoading ? "Loading..." : numberValues.toNumber()}</h1>
+        </div>
+
+        {
+          address && (
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%"
+            }}>
+              <input 
+                type="number" 
+                value={newValue} onChange={(e) => setNewValue(parseInt(e.target.value))} 
+                style={{
+                  marginBottom: "1rem",
+                  width: "100%",
+                  padding: "0.5rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid black"
+                }}
+              />
+              <Web3Button
+                contractAddress="your contract address here"
+                action={(contract) => contract.call("store", [newValue])}
+                style={{
+                  width: "100%",
+                  backgroundColor:"royalblue",
+                  color: "white"
+                }}
+                onSubmit={() => setNewValue(0)}
+                onSuccess={() => alert("Success")}
+                onError={(error) => alert(error.message)}
               >
-                thirdweb.
-              </a>
-            </span>
-          </h1>
-
-          <p className={styles.description}>
-            Get started by configuring your desired network in{" "}
-            <code className={styles.code}>src/index.js</code>, then modify the{" "}
-            <code className={styles.code}>src/App.js</code> file!
-          </p>
-
-          <div className={styles.connect}>
-            <ConnectWallet
-              dropdownPosition={{
-                side: "bottom",
-                align: "center",
-              }}
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://portal.thirdweb.com/"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/images/portal-preview.png"
-              alt="Placeholder preview of starter"
-              width={300}
-              height={200}
-            />
-            <div className={styles.cardText}>
-              <h2 className={styles.gradientText1}>Portal ➜</h2>
-              <p>
-                Guides, references, and resources that will help you build with
-                thirdweb.
-              </p>
+                Set New Value
+              </Web3Button>
             </div>
-          </a>
+          )
+        }
 
-          <a
-            href="https://thirdweb.com/dashboard"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/images/dashboard-preview.png"
-              alt="Placeholder preview of starter"
-              width={300}
-              height={200}
-            />
-            <div className={styles.cardText}>
-              <h2 className={styles.gradientText2}>Dashboard ➜</h2>
-              <p>
-                Deploy, configure, and manage your smart contracts from the
-                dashboard.
-              </p>
-            </div>
-          </a>
-
-          <a
-            href="https://thirdweb.com/templates"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              src="/images/templates-preview.png"
-              alt="Placeholder preview of templates"
-              width={300}
-              height={200}
-            />
-            <div className={styles.cardText}>
-              <h2 className={styles.gradientText3}>Templates ➜</h2>
-              <p>
-                Discover and clone template projects showcasing thirdweb
-                features.
-              </p>
-            </div>
-          </a>
-        </div>
       </div>
-    </main>
+
+    </div>
   );
 };
 
